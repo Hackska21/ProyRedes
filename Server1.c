@@ -1,4 +1,5 @@
 
+#include "Funciones_Sockets.c"
 
 struct Dir
 {

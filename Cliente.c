@@ -1,3 +1,4 @@
+/*
 //Estandars 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +11,7 @@
 #include <netdb.h>   
 #include <netinet/in.h>
 //Hilos
-#include <pthread.h>
+#include <pthread.h>*/
 
 #include "Funciones_Sockets.c"
 
