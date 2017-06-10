@@ -30,7 +30,7 @@ int VerificarPrefijo (char * Cadena)//Sirve para encontrar Archivos A omitir
 void ListarArchivos(int sockt,char* directorio)
 {
 
-
+	printf("Listando Archios de %s\n",directorio);
 	/* Con un puntero a DIR abriremos el directorio */
   DIR *dir;
   /* en *ent habrá información sobre el archivo que se está "sacando" a cada momento */
@@ -55,6 +55,7 @@ void ListarArchivos(int sockt,char* directorio)
       if (tipo==DT_REG)
         {
           ++numfiles;
+          printf("Leyendo Archivo: %s\n",ent->d_name );
            if(VerificarPrefijo(ent->d_name)==0)//Si no se esta recibiendo
            {
            		EnviarMensaje(sockt,ent->d_name,strlen(ent->d_name));
@@ -74,7 +75,7 @@ void ListarArchivos(int sockt,char* directorio)
   
   
 
-  EnviarMensaje(sockt,"Listado_Completo",strlen(ent->d_name));
+  EnviarMensaje(sockt,"Listado_Completo",50);
   
 	
 
@@ -83,3 +84,51 @@ void ListarArchivos(int sockt,char* directorio)
 }
 
 
+
+
+
+int EnviarParte(int sockt,char* NombreAr, int NoParte)
+{
+	FILE* Archivo;
+	char Buff[TamPaquetes];
+	//Abrirmos Archivo
+	Archivo=fopen(NombreAr,"rb");
+	long Desplazamiento=NoParte*TamPaquetes;
+
+	//Nos movemos
+	fseek(Archivo,Desplazamiento,SEEK_END);
+
+	//Leemos
+	int i=fread(Buff,1,TamPaquetes,Archivo);
+
+	//Mandamos
+	EnviarMensaje(sockt,Buff,i);
+
+	//Terminamos
+
+	//Cerramos
+	fclose(Archivo);
+
+
+}
+
+int FunEnviarParte(int sockt,char* Directorio)
+{
+	//Debe llegar el nombre del Archivo
+	char BufferEnviar[50],BufferRecibir[50];
+	RecibirMensaje(sockt,BufferRecibir,50);
+	//Verificamos que esta el archivo (En teoria no debe existir nunca problema)
+	char* Nombre=BuscaNombre (Directorio,BufferRecibir);
+	if(BuscaNombre!=NULL)
+	{
+		EnviarMensaje(sockt,"Parte?",50);
+		RecibirMensaje(sockt,BufferRecibir,50);
+		int parte=atoi(BufferRecibir);
+		EnviarParte(sockt,Nombre,parte);
+
+	}
+	else
+	{
+		EnviarMensaje(sockt,"EnviandoRehusado",50);
+	}
+}

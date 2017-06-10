@@ -4,6 +4,9 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 
 //Sockets
 #include <sys/socket.h>
@@ -12,10 +15,17 @@
 //Hilos
 #include <pthread.h>
 
-#include "Funciones_Sockets.c"
 #include <dirent.h>
 
 #define TamPaquetes 512
+
+
+int EnviarMensaje(int Socket,char* mensaje,int Tamano);
+int RecibirMensaje(int Socket,char* mensaje,int Tamano);
+
+
+
+
 
 struct Dir
 {
@@ -66,6 +76,7 @@ int InitSockServ(char *Puerto)//Inicializa un socket Servidor.
      	printf("Error al escuchar\n");
      	exit(-1);
     }
+    printf("Socket Servidor Iniciado\n");
     return sockt;
 
 }
@@ -74,7 +85,7 @@ int InitSockClien(char* Puerto, char* IP)
 {
 	int x = socket(AF_INET, SOCK_STREAM, 0),TAM;    
 	struct sockaddr_in conect_serv;
-
+	printf("Creando Socket Cliente\n");
 	if(x == -1)
 	{
 	        printf("Error al crear el socket");
@@ -87,7 +98,7 @@ int InitSockClien(char* Puerto, char* IP)
 	//printf("yaaa\n");
 	conect_serv.sin_port = htons(atoi(Puerto));//Puerto);  // cast requerido para el campo
 
-
+	printf("Tratando de conectarse\n");
 	//paso 3 conectarse al servidor
 	while(1){
 	if(connect(x,(struct sockaddr*)&conect_serv, sizeof(conect_serv)) == -1)

@@ -68,6 +68,66 @@ unsigned char getFileType(char *nombre, struct dirent *ent)
 
   return tipo;
 }
+
+
+char* BuscaNombre (char *ruta,char* NombreArchivo)
+{
+
+  //Con un puntero a DIR abriremos el directorio
+    DIR *dir;
+
+  /* en *ent habrá información sobre el archivo que se está "sacando" a cada momento */
+  struct dirent *ent;
+  unsigned char tipo;       /* Tipo: fichero /directorio/enlace/etc */
+  char *nombrecompleto;     /* Nombre completo del fichero */
+  char *posstr;         /* Cadena usada para posicionarnos horizontalmente */
+
+    //Abrimos directorio
+    dir = opendir (ruta);
+  /* Miramos que no haya error */
+  if (dir == NULL) 
+  error("No puedo abrir el directorio");
+  
+    printf("Archivos en Carpeta!\n\n");
+  /* Leyendo uno a uno todos los archivos que hay */
+  while ((ent = readdir (dir)) != NULL) 
+  {
+  
+  /* Nos devolverá el directorio actual (.) y el anterior (..), como hace ls */
+  if ( (strcmp(ent->d_name, ".")!=0) && (strcmp(ent->d_name, "..")!=0) )
+  {
+    nombrecompleto=getFullName(ruta, ent);
+    tipo=getFileType(nombrecompleto, ent);
+    
+    
+      if (tipo==DT_REG)
+      {
+        
+        //printf("%d) %s\ttamaño %.3lf mb\ttipo %d\n",NumeroArchivo,ent->d_name,((double)fileSize(ent->d_name))/1000,tipo);
+        
+        if(strcmp(NombreArchivo,ent->d_name)==0)
+        {
+          
+          return nombrecompleto;
+        }
+        
+      }
+
+      else if (tipo==DT_DIR)
+      {
+
+      }
+      free(nombrecompleto);
+  }
+  }
+  closedir (dir);
+  return NULL;
+}
+
+
+
+
+
 char*  BuscaArchivos(char *ruta,int numero)
 {
   /* Con un puntero a DIR abriremos el directorio */
