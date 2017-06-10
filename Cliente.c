@@ -14,9 +14,12 @@
 #include <pthread.h>*/
 
 #include "Funciones_Sockets.c"
+#include "FuncionesDirectorios.c"
+#include "EnviarRecibirArchivos.c"
 
 
-void* HiloServidorCliente()//Se escuchan Peticiones del Cliente
+
+void* HiloServidorCliente(void* Arg)//Se escuchan Peticiones del Cliente
 {
 	int x2=(int)Arg,TAM; 
   //printf("Mi canal es: %d :v ",x2);
@@ -32,6 +35,7 @@ void* HiloServidorCliente()//Se escuchan Peticiones del Cliente
 	if(strcmp(BufferRecibir,"ListarArchivos"))
 	{
 		void ListarArchivos(x2);
+		printf("Se termino de ListarArchivos\n");
 	}
 
 	else if(strcmp(BufferRecibir,"PedirParte"))
@@ -103,9 +107,30 @@ void* HiloServidor(void* Arg)//Al Escucha de Peticiones
 
 }
 
+
+void Menu()
+{
+	int op;
+	char BufferEnviar[50];
+	do{
+		printf("¿Que desea Hacer\n
+			1)Solicitar ListarArchivos\n 
+			2)Salir\n");
+		scanf("%d",&op);
+		if(op)
+		{
+			printf("Nombre de Archivo");
+			scanf("%[^\n]",BufferEnviar);
+		}
+
+	}while(op);
+}
+
+
 void HiloCliente()//Con el Que se hacen las peticiones;
 {
 	int server2=InitSockClien(ServInf.puerto,"0.0.0.0");
+
 }
 
 
@@ -123,6 +148,7 @@ int main(int argc, char const *argv[])
   	ServInf.puerto=argv[1];
   	pthread_create (&Des_HiloRecibir, NULL,HiloServidor  ,(void*)&ServInf);
 
+  	HiloCliente();
      
   //system("./prueba.exec");
   //execl("/bin/ls","ls","-1","/usr",0);
