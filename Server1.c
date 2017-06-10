@@ -1,13 +1,7 @@
 
 #include "Funciones_Sockets.c"
 
-struct Dir
-{
-  char* puerto;
-  char* ip;
-  char parte;
 
-};
 
 
 void Hilo(void* Arg){

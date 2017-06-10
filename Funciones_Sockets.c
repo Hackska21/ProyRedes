@@ -13,6 +13,17 @@
 #include <pthread.h>
 
 #include "Funciones_Sockets.c"
+#include <dirent.h>
+
+#define TamPaquetes 512
+
+struct Dir
+{
+  char* puerto;
+  char* ip;
+  //char parte;
+
+};
 
 int InitSockServ(char *Puerto)//Inicializa un socket Servidor. 
 {
