@@ -84,6 +84,13 @@ void ListarArchivos(int sockt,char* directorio)
 }
 
 
+int DescargarArchivo(int sockts*,int NoSockts,char* NombreAr,char* Directorio)
+{
+
+}
+
+
+
 
 
 
