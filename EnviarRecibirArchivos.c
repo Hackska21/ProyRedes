@@ -88,21 +88,34 @@ int DescargarArchivo(int sockts*,int NoSockts,char* NombreAr,char* Directorio)
 {
 	int i=0;
 	char BufferEnviar[50],BufferRecibir[50];
-	
+	int NoParte=0;
+	char buffAr[TamPaquetes];
 
 	while(1)//Pediremos Parte
 	{
 		EnviarMensaje(sockts[i],"PedirParte",50);
 		EnviarMensaje(sockts[i],NombreAr,50);
-		RecibirMensaje()
+		RecibirMensaje(sockts[i],BufferRecibir,50);
+		if()
+		{
+			sprintf(BufferEnviar,"%d",NoParte);
+			EnviarMensaje(sockts[i],BufferEnviar,50);
+			//Aqui recibir Si ah acabado o no
+			RecibirMensaje(sockts[i],buffAr,TamPaquetes);
+			if()
+			{
 
+			}
+			else
+			{
+				
+			}
 
+		}
+		else
+		{
 
-
-
-
-
-
+		}
 
 	if(i==NoSockts)
 		i=0;
