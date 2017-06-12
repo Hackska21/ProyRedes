@@ -86,7 +86,29 @@ void ListarArchivos(int sockt,char* directorio)
 
 int DescargarArchivo(int sockts*,int NoSockts,char* NombreAr,char* Directorio)
 {
+	int i=0;
+	char BufferEnviar[50],BufferRecibir[50];
+	
 
+	while(1)//Pediremos Parte
+	{
+		EnviarMensaje(sockts[i],"PedirParte",50);
+		EnviarMensaje(sockts[i],NombreAr,50);
+		RecibirMensaje()
+
+
+
+
+
+
+
+
+
+	if(i==NoSockts)
+		i=0;
+	else
+		i++;
+	}
 }
 
 
