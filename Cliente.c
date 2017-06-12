@@ -146,13 +146,13 @@ void Menu()
 }
 
 
-void HiloCliente()//Con el Que se hacen las peticiones;
+void HiloCliente(char* puerto)//Con el Que se hacen las peticiones;
 {
 	//int server2=InitSockClien(ServInf.puerto,"0.0.0.0");
 	//getchar();
 
 	//EjemploPedirListado
-	int server2=InitSockClien("9000","0.0.0.0");
+	int server2=InitSockClien(puerto,"0.0.0.0");
 	char BufferEnviar[50],BufferRecibir[50];
 	EnviarMensaje(server2,"ListarArchivos",50);
 	while(1)
@@ -165,6 +165,13 @@ void HiloCliente()//Con el Que se hacen las peticiones;
 	  	break;
 	  }
   }
+
+  //EjemploPedirArchiv
+  int sock[1];
+  sock[0]=server2;
+  DescargarArchivo(sock,1,"Firma.jpg","./Prueba/");
+
+
   //CerrarComuicacion
   EnviarMensaje(server2,"CerrarComuicacion",50);
 
@@ -188,7 +195,7 @@ int main(int argc, char const *argv[])
 
   	pthread_create (&Des_HiloServidor, NULL,HiloServidor  ,(void*)&ServInf);
   	//printf("O:\n");
-  	HiloCliente();
+  	HiloCliente(argv[2]);
   	pthread_join (Des_HiloServidor, NULL);
   	
      

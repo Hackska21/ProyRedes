@@ -136,4 +136,5 @@ int RecibirMensaje(int Socket,char* mensaje,int Tamano)
 	exit(1);        
 	}
 	mensaje[TAM]='\0';
+	return TAM;
 }
