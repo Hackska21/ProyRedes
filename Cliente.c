@@ -50,7 +50,7 @@ void* HiloServidorCliente(void* Arg)//Se escuchan Peticiones del Cliente
   {
 
 	RecibirMensaje(x2,BufferRecibir,50);
-	printf("Se recibio: %s\n", BufferRecibir);
+	//printf("Se recibio: %s\n", BufferRecibir);
 
 	if(strcmp(BufferRecibir,"ListarArchivos")==0)
 	{
@@ -146,14 +146,18 @@ void Menu()
 }
 
 
-void HiloCliente(char* puerto)//Con el Que se hacen las peticiones;
+void HiloCliente(char* puerto,char* ip)//Con el Que se hacen las peticiones;
 {
 	//int server2=InitSockClien(ServInf.puerto,"0.0.0.0");
 	//getchar();
+	int server2=InitSockClien(puerto,ip);
+	char BufferEnviar[50],BufferRecibir[50];
+	//EnviarMensaje(server2,puerto,50);
+
+
+
 
 	//EjemploPedirListado
-	int server2=InitSockClien(puerto,"0.0.0.0");
-	char BufferEnviar[50],BufferRecibir[50];
 	EnviarMensaje(server2,"ListarArchivos",50);
 	while(1)
   {
@@ -195,7 +199,7 @@ int main(int argc, char const *argv[])
 
   	pthread_create (&Des_HiloServidor, NULL,HiloServidor  ,(void*)&ServInf);
   	//printf("O:\n");
-  	HiloCliente(argv[2]);
+  	HiloCliente(argv[2],argv[3]);
   	pthread_join (Des_HiloServidor, NULL);
   	
      

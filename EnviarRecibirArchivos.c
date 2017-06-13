@@ -83,6 +83,49 @@ void ListarArchivos(int sockt,char* directorio)
 
 }
 
+int FunPendirArchivo(int sockt,char* NombreAr,char* Directorio)
+{
+	
+	int NoHost=0;
+	int* Hosts;
+	struct Dir* InfoHosts;
+	char BufferEnviar[50],BufferRecibir[50];
+
+	//PedirNoHost
+
+	NoHost=atoi(BufferRecibir);
+	NoHost;
+
+	//Redimensionamos la estructura
+	InfoHosts=(struct Dir)malloc(NoHost*sizeof(struct Dir));
+	//Pedir Host eh IP al server principal
+	int i=0;
+	while(1)
+	{
+		if(strcmp(BufferRecibir,"")==0)
+		{
+			break;
+		}
+		InfoHosts[i].puerto=
+		InfoHosts[i].ip=
+		i++;
+	}
+
+	//N
+
+}
+
+int* ConectarHosts(int NoHost ,struct Dir* Hosts)//Conecta a los host Especificados y regresa los descriptores
+{
+	int* Sockets=(int)malloc(sizeof(int)*NoHost);
+	int i;
+	for (i = 0; i < NoHost; ++i)
+	{
+		Sockets[i]=InitSockClien(Hosts[i].puerto,Host[i].ip);
+	}
+	return Sockets;
+}
+
 
 int DescargarArchivo(int* sockts,int NoSockts,char* NombreAr,char* Directorio)
 {
@@ -139,7 +182,6 @@ int DescargarArchivo(int* sockts,int NoSockts,char* NombreAr,char* Directorio)
 		printf("Archivo renombrado\n");
 	}
 }
-
 
 
 

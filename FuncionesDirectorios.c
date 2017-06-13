@@ -88,7 +88,7 @@ char* BuscaNombre (char *ruta,char* NombreArchivo)
   if (dir == NULL) 
   error("No puedo abrir el directorio");
   
-    printf("Archivos en Carpeta!\n\n");
+    //printf("Archivos en Carpeta!\n\n");
   /* Leyendo uno a uno todos los archivos que hay */
   while ((ent = readdir (dir)) != NULL) 
   {
