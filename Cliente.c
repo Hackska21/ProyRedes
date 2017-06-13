@@ -129,7 +129,7 @@ void* HiloServidor(void* Arg)//Al Escucha de Peticiones
 }
 
 
-void Menu()
+void Menu(int sock)
 {
 	int op;
 	char BufferEnviar[50];
@@ -140,20 +140,21 @@ void Menu()
 		{
 			printf("Nombre de Archivo");
 			scanf("%[^\n]",BufferEnviar);
+			FunPendirArchivo(sock,BufferEnviar,Directorio);
 		}
 
 	}while(op);
 }
 
 
-void HiloCliente(char* puerto,char* ip)//Con el Que se hacen las peticiones;
+void HiloCliente(char* puerto,char* ip,char* puertoEscucha)//Con el Que se hacen las peticiones;
 {
 	//int server2=InitSockClien(ServInf.puerto,"0.0.0.0");
 	//getchar();
 	int server2=InitSockClien(puerto,ip);
 	char BufferEnviar[50],BufferRecibir[50];
-	//EnviarMensaje(server2,puerto,50);
-
+	//EnviarMensaje(server2,puertoEscucha,50);
+	//menu(server2)
 
 
 
