@@ -16,6 +16,7 @@
 #include <pthread.h>
 
 #include <dirent.h>
+#include <arpa/inet.h>
 
 #define TamPaquetes 512
 
@@ -38,7 +39,8 @@ struct Dir
 int InitSockServ(char *Puerto)//Inicializa un socket Servidor. 
 {
 //paso 1 creando el socket
-  int sockt;  
+  int sockt; 
+  int bandera; 
   struct sockaddr_in conect_serv,conect_cliente;  // estructura del socket
   sockt = socket(AF_INET, SOCK_STREAM, 0);
   
@@ -56,7 +58,8 @@ int InitSockServ(char *Puerto)//Inicializa un socket Servidor.
   memset(&conect_serv,0,sizeof(conect_serv));      // llena con 0 toda la estructura
   conect_serv.sin_family = AF_INET;                
   conect_serv.sin_addr.s_addr = INADDR_ANY; //inet_addr(argv[2]);    // cast requerido para el campo
-  conect_serv.sin_port = htons(atoi(Puerto));//Puerto);            // cast requerido para el campo  
+  conect_serv.sin_port = htons(atoi(Puerto));//Puerto);            // cast requerido para el campo
+  setsockopt(sockt, SOL_SOCKET, SO_REUSEADDR, &bandera, sizeof(int));  
       
       
   //printf("Dirección IP: %s\n",inet_ntoa(conect_serv.sin_addr.s_addr));
