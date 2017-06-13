@@ -171,7 +171,7 @@ int EnviarParte(int sockt,char* NombreAr, int NoParte)
 
 	//Cerramos
 	fclose(Archivo);
-	printf("Termine de enviar Parte\n");
+	//printf("Termine de enviar Parte\n");
 
 }
 
@@ -182,13 +182,13 @@ int FunEnviarParte(int sockt,char* Directorio)
 	RecibirMensaje(sockt,BufferRecibir,50);
 	//Verificamos que esta el archivo (En teoria no debe existir nunca problema)
 	char* Nombre=BuscaNombre (Directorio,BufferRecibir);
-	printf("Voy a enviar %s\n",Nombre);
+	//printf("Voy a enviar %s\n",Nombre);
 	if(BuscaNombre!=NULL)
 	{
 		EnviarMensaje(sockt,"Parte?",50);
 		RecibirMensaje(sockt,BufferRecibir,50);
 		int parte=atoi(BufferRecibir);
-		printf("Procedo a enviar parte %d\n", parte);
+		//printf("Procedo a enviar parte %d\n", parte);
 		EnviarParte(sockt,Nombre,parte);
 
 	}
