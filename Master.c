@@ -32,6 +32,16 @@ main(int argc, char *argv[]) // PuertoPropio IP_otroM Puerto_otroM
 	pthread_create(&hilos, NULL, &hilo2, (void*)des_canal);
 	strcpy(IP,"\0");
 	strcpy(IP_otroM,argv[2]);
+	
+
+
+	printf("Creacion canal....\n");
+    hilos = (pthread_t *) malloc((1) * sizeof(pthread_t));
+	des_canal = accept(sock1, (struct sockaddr*)&connect_clien, &tam); // aceptando primer sol(master)
+    strcpy(IP,inet_ntoa(connect_clien.sin_addr)); 
+    pthread_create(&hilos, NULL, &hilo1, (void*)des_canal);
+
+
 	while(1)
     {
     	printf("Creacion canal....\n");
@@ -45,6 +55,8 @@ main(int argc, char *argv[]) // PuertoPropio IP_otroM Puerto_otroM
             printf("Error al crear el canal");
             exit(1);
         }   
+        pthread_create(&hilos, NULL, &hilo0, (void*)des_canal);	
+        
              
         //if(strcmp(IP,IP_otroM) != 0) // ULtima ip que recibe diferente al otro master
         if(puerto == ntohs(connect_clien.sin_port))
