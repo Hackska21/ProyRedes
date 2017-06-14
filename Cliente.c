@@ -135,10 +135,12 @@ void Menu(int sock)
 	char BufferEnviar[50];
 	do{
 		printf("¿Que desea Hacer\n1)Solicitar ListarArchivos\n2)Salir\n");
+		
 		scanf("%d",&op);
 		if(op)
 		{
 			printf("Nombre de Archivo");
+			getchar();
 			scanf("%[^\n]",BufferEnviar);
 			FunPendirArchivo(sock,BufferEnviar,Directorio);
 		}
@@ -153,10 +155,10 @@ void HiloCliente(char* puerto,char* ip,char* puertoEscucha)//Con el Que se hacen
 	//getchar();
 	int server2=InitSockClien(puerto,ip);
 	char BufferEnviar[50],BufferRecibir[50];
-	//EnviarMensaje(server2,puertoEscucha,50);
-	//menu(server2)
+	EnviarMensaje(server2,puertoEscucha,50);
+	Menu(server2);
 
-
+	//getchar();
 
 	//EjemploPedirListado
 	EnviarMensaje(server2,"ListarArchivos",50);
@@ -200,7 +202,7 @@ int main(int argc, char const *argv[])
 
   	pthread_create (&Des_HiloServidor, NULL,HiloServidor  ,(void*)&ServInf);
   	//printf("O:\n");
-  	HiloCliente(argv[2],argv[3]);
+  	HiloCliente(argv[2],argv[3],argv[1]);
   	pthread_join (Des_HiloServidor, NULL);
   	
      

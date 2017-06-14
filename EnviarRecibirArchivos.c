@@ -92,15 +92,18 @@ int FunPendirArchivo(int sockt,char* NombreAr,char* Directorio)
 	char BufferEnviar[50],BufferRecibir[50];
 
 	EnviarMensaje(sockt,"EnviarArchivo",50);
+	EnviarMensaje(sockt,NombreAr,50);
 
 	//PedirNoHost
 	RecibirMensaje(sockt,BufferRecibir,50);
 	NoHost=atoi(BufferRecibir);
 	//NoHost;
+	
 
 	//Redimensionamos la estructura
-	InfoHosts=(struct Dir)malloc(NoHost*sizeof(struct Dir));
+	InfoHosts=(struct Dir*)malloc(NoHost*sizeof(struct Dir));
 	//Pedir Host eh IP al server principal
+	/*
 	int i=0;
 	while(1)
 	{
@@ -108,8 +111,8 @@ int FunPendirArchivo(int sockt,char* NombreAr,char* Directorio)
 		{
 			break;
 		}
-		InfoHosts[i].puerto=
-		InfoHosts[i].ip=
+		InfoHosts[i].puerto=BufferRecibir;
+		InfoHosts[i].ip=BufferRecibir
 		i++;
 	}
 
@@ -122,7 +125,7 @@ int FunPendirArchivo(int sockt,char* NombreAr,char* Directorio)
 		close(host[i]);	
 	}
 
-
+*/
 	//N
 
 }
@@ -133,7 +136,7 @@ int* ConectarHosts(int NoHost ,struct Dir* Hosts)//Conecta a los host Especifica
 	int i;
 	for (i = 0; i < NoHost; ++i)
 	{
-		Sockets[i]=InitSockClien(Hosts[i].puerto,Host[i].ip);
+		//Sockets[i]=InitSockClien(Hosts[i].puerto,Host[i].ip);
 	}
 	return Sockets;
 }
