@@ -21,6 +21,9 @@ int Elegido = 0;
 char Archivo[50];
 struct InfoCliente *InInformacionTodos;
 
+char puerto[50];
+int ip[50];
+
 
  
 main(int argc, char *argv[]) // PuertoPropio IP_otroM Puerto_otroM
@@ -28,11 +31,15 @@ main(int argc, char *argv[]) // PuertoPropio IP_otroM Puerto_otroM
 	
 	sock1 = InitSockServ(argv[1]); //Socket Servidor
 	sock2 = InitSockClien(argv[3], argv[2]); //socket cliente
+	printf("sock2 %d\n",sock2 );
 	struct InfoCliente A;
 	struct sockaddr_in connect_clien;
 	char IP[16];
 
 	InInformacionTodos = NULL;
+
+	strcpy(puerto,argv[3]);
+	strcpy(ip,argv[2]);
 
 	
 	pthread_t *hilos;
@@ -56,11 +63,13 @@ main(int argc, char *argv[]) // PuertoPropio IP_otroM Puerto_otroM
 
 	while(1)
     	{
-    		printf("Creacion canal....\n");
+    		printf("Creacion canal....");
       	hilos = (pthread_t *) malloc((1) * sizeof(pthread_t));
 	      tam = sizeof(connect_clien);
 	      des_canal = accept(sock1, (struct sockaddr*)&connect_clien, &tam);
 	      conectados++;
+	      printf(" %d \n", conectados);
+	      
 	      if( des_canal == -1)
 	      {
 	      	printf("Error al crear el canal");
@@ -71,6 +80,8 @@ main(int argc, char *argv[]) // PuertoPropio IP_otroM Puerto_otroM
 	      strcpy(InInformacionTodos[conectados-1].IP,inet_ntoa(connect_clien.sin_addr)); //Se copia IP a estructura global
 	      InInformacionTodos[conectados-1].des_canal = des_canal;
 	      InInformacionTodos[conectados-1].numeroID = conectados-1;
+
+	      printf("IP:%s\n",inet_ntoa(connect_clien.sin_addr) );
 
 	      strcpy(A.IP,inet_ntoa(connect_clien.sin_addr)); 
 	      A.des_canal = des_canal;
@@ -98,16 +109,17 @@ void *hilo0 (void *arg) // Atiende a todos los clientes p2p
 
 	while(1)
 	{
-		RecibirMensaje(info.des_canal,buffer,100); 
+		RecibirMensaje(info.des_canal,buffer,50); 
 		if(strcmp(buffer,"EnviarArchivo") == 0)
 		{
-			RecibirMensaje(info.des_canal,buffer,10); // Recibir nombreeee del archivo
+			RecibirMensaje(info.des_canal,buffer,50); // Recibir nombreeee del archivo
 			printf("Archivo solicitado: %s\n",buffer);
 			x = buscarArchivo(buffer, info.numeroID);
 			if(x == 0)
 			{
 				printf("No se encontro de este lado...\n");
 				strcpy(Archivo,buffer);
+				printf("Archivo   %s\n", Archivo);
 				Elegido = info.numeroID;
 				Bandera = 1; // hilo 1
 				
@@ -124,51 +136,63 @@ void *hilo1 (void *arg) // comunicaciones master a master Server
 {
 	int des_canal = (int) arg;
 	char buffer[512];
-	int socktemp;
+	char buffer2[512];
+	//int socktemp;
 	RecibirMensaje(des_canal,buffer,512);
 	printf("Recibiendo %s\n",buffer);
 	while(1)
 	{
+		printf(":v---\n");
 		sleep(2);
 		if(Bandera == 1)
 		{
-			printf("Solicitando al otro Master...\n");
-			EnviarMensaje(des_canal,"SolicitudBusqueda",strlen("SolicitudBusqueda"));
-			EnviarMensaje(des_canal,Archivo,strlen(Archivo));
-			RecibirMensaje(des_canal,buffer,strlen(buffer)); // sin resultados 
-			socktemp = InitSockClien(InInformacionTodos[Elegido].IP,InInformacionTodos[Elegido].Puerto);
+			printf("Solicitando al otro Master...%s\n", Archivo);
+			EnviarMensaje(des_canal,"SolicitudBusqueda",512);
+			
+
+			EnviarMensaje(des_canal,Archivo,512);
+			printf("Envio nombre realizado\n");
+
+			
+
+			RecibirMensaje(des_canal,buffer,512); // sin resultados 
+			printf("Buffer %s\n",buffer );
+			
+			//socktemp = InitSockClien(InInformacionTodos[Elegido].IP,InInformacionTodos[Elegido].Puerto);
 			if(strcmp(buffer,"SinResultados") == 0)
 			{
-					
-				EnviarMensaje(socktemp,"SinResultados",strlen("SinResultados"));	
+				printf("Resultados otro SinResultados\n");		
+				EnviarMensaje(InInformacionTodos[Elegido].des_canal,"SinResultados",strlen("SinResultados"));	
 
 			}
 			if(strcmp(buffer,"EnvioInfo") == 0)
 			{
-				
-				EnviarMensaje(socktemp,"EnvioInfo",strlen("EnvioInfo"));
+				printf("Resultados otro IP\n");
 
-				RecibirMensaje(des_canal,buffer,strlen(buffer)); // Cantidad
-				EnviarMensaje(socktemp,buffer,strlen(buffer));
+				RecibirMensaje(des_canal,buffer,512); // Cantidad
+				EnviarMensaje(InInformacionTodos[Elegido].des_canal,buffer,512);
 
 				while(1)
 				{
-					RecibirMensaje(des_canal,buffer,strlen(buffer)); // IP
-					if(strcmp(buffer,"TerminaenvioIP") == 0)
+					RecibirMensaje(des_canal,buffer2,512); // IP
+					printf("buffer %s\n",buffer2);
+					if(strcmp(buffer2,"Fin") == 0)
 					{
-						EnviarMensaje(socktemp,buffer,strlen(buffer));	//Envia TerminaEnvio
+						strcpy(buffer2,"TerminaenvioIP");
+						printf("Salir del while\n");
 						break;	
 					}
-					EnviarMensaje(socktemp,buffer,strlen(buffer));//Envia IP
+					EnviarMensaje(InInformacionTodos[Elegido].des_canal,buffer2,512);//Envia IP
 
-					RecibirMensaje(des_canal,buffer,strlen(buffer)); // Puerto
-					EnviarMensaje(socktemp,buffer,strlen(buffer));//Envia Puerto
+					RecibirMensaje(des_canal,buffer,512); // Puerto
+					EnviarMensaje(InInformacionTodos[Elegido].des_canal,buffer2,512);//Envia Puerto
 					
 				}
 				
 			}
+			printf("Bandera = 0\n");
 			Bandera = 0;
-			close(socktemp);	
+			
 		}
 	}
 }
@@ -181,15 +205,17 @@ void *hilo2 (void *arg) // comunicaciones master a master Cliente
 	char buffer[512];
 	strcpy(buffer,"Conectado");
 	int x;
-	EnviarMensaje(sock2,buffer,strlen(buffer));
+	EnviarMensaje(sock2,buffer,512);
 	printf("Enviando Conectado\n");
 	while(1)
 	{
 		sleep(2);
-		RecibirMensaje(sock2,buffer,strlen(buffer));
-		if(strcmp(buffer,"SolicitudBusqueda"))
+		RecibirMensaje(sock2,buffer,512);
+		printf("%s\n",buffer );
+		if(strcmp(buffer,"SolicitudBusqueda")==0)
 		{
-			RecibirMensaje(sock2, buffer,strlen(buffer));
+			printf("Solicitud\n");
+			RecibirMensaje(sock2, buffer,512);
 			printf("Archivo solicitado del otro master: %s\n",buffer);
 			x = buscarArchivoTodos(buffer);
 		}
@@ -204,58 +230,68 @@ int buscarArchivo (char *archivo, int numeroIDsol) // Archivo que se busca, ID d
 	int i;
 	int *sockets;
 	char buffer[512];
+	char buffer2[512];
 	int encontrados = 0; 
-	int socktemp;
 	int Ip_ubicaciones[conectados];
 	
-	sockets = (int)malloc(sizeof(int)*conectados);
+	//sockets = (int)malloc(sizeof(int)*conectados);
+	//printf("------Conectados %d\n",conectados );
 	for (i = 0; i < conectados; i++)
 	{
+		strcpy(buffer,"\0");
 		Ip_ubicaciones[i] = 0; //inicia 0
-		if(strcmp(InInformacionTodos[numeroIDsol].IP, InInformacionTodos[i].IP) != 0) //strcmp(puertosol, puerto[i]) == 0
-		{
-			printf("%s    %s\n", InInformacionTodos[i].Puerto, InInformacionTodos[i].IP);		
-			sockets[i] = InitSockClien(InInformacionTodos[i].Puerto, InInformacionTodos[i].IP);
-			EnviarMensaje(sockets[i],"ListarArchivos",strlen("ListarArchivos"));
+		//if(strcmp(InInformacionTodos[numeroIDsol].IP, InInformacionTodos[i].IP) != 0 && strcmp(InInformacionTodos[numeroIDsol].Puerto, InInformacionTodos[i].Puerto) != 0) //strcmp(puertosol, puerto[i]) == 0
+		//{
+			//printf("%s    %s\n", InInformacionTodos[i].Puerto, InInformacionTodos[i].IP);		
+			int j = InitSockClien(InInformacionTodos[i].Puerto, InInformacionTodos[i].IP);
+			//getchar();
+			//printf("Antes de enviar ListarArchivos\n");
+			EnviarMensaje(j,"ListarArchivos",50);
+			///printf("Despues de enviar ListarArchivos\n");
 			while(1)
 	  		{
-				RecibirMensaje(sockets[i],buffer,100);
-		  		printf("recibi %s\n",buffer );
-		  		if(strcmp(buffer,archivo) == 0);
+				RecibirMensaje(j,buffer,100);
+		  		//printf("comparando %s con %s\n",archivo, buffer );
+		  		if(strcmp(buffer,archivo) == 0)
 		  		{
 		  			Ip_ubicaciones[i] = 1; //  cuando hay coincidencia
+		  			//printf("coincidencia\n");
 		  			encontrados++;
 		  		}
 		  		if(strcmp(buffer,"Listado_Completo")==0)
 		  		{
-		  			printf("Listado terminado\n");
+		  			//printf("Listado terminado\n");
 		  			break;
 		  		}
 	  		}
-			close(sockets[i]);
-		}
+	  		EnviarMensaje(j,"CerrarComuicacion",50);
+			close(j);
+
 	}
+	//}
 	if (encontrados == 0)
 	{
+		//printf("Sin resultados funcion\n");
 		return 0;
 	}
 
 
-
-	socktemp = InitSockClien(InInformacionTodos[numeroIDsol].IP, InInformacionTodos[numeroIDsol].Puerto);
-	EnviarMensaje(socktemp,"EnvioInfo",strlen("EnvioInfo")); // envia mensaje para enviar ip y puertos
-	sprintf(buffer,"%d",encontrados); 
-	EnviarMensaje(socktemp,buffer,strlen(buffer));  //	cantidad de encontrados
+	strcpy(buffer2,"\0");
+	sprintf(buffer2,"%d",encontrados); 
+	//printf("encontrados %d, buffer %s\n",encontrados, buffer );
+	
+	EnviarMensaje(InInformacionTodos[numeroIDsol].des_canal,buffer2,50);  //	cantidad de encontrados
 	for (i = 0; i < conectados; i++)
 	{
 		if(Ip_ubicaciones[i] == 1)
 		{
-			EnviarMensaje(socktemp, InInformacionTodos[i].IP, strlen(InInformacionTodos[i].IP));
-			EnviarMensaje(socktemp, InInformacionTodos[i].Puerto, strlen(InInformacionTodos[i].Puerto));
+			EnviarMensaje(InInformacionTodos[numeroIDsol].des_canal, InInformacionTodos[i].IP, 50);
+			EnviarMensaje(InInformacionTodos[numeroIDsol].des_canal, InInformacionTodos[i].Puerto,50);
 		}		
 	}
-	EnviarMensaje(socktemp, "TerminaenvioIP", strlen("TerminaenvioIP"));
-	close(socktemp);
+	//printf("Termino envio ip\n");
+	EnviarMensaje(InInformacionTodos[numeroIDsol].des_canal, "TerminaenvioIP", 50);
+	
 	return encontrados;
 }
 
@@ -263,56 +299,62 @@ int buscarArchivo (char *archivo, int numeroIDsol) // Archivo que se busca, ID d
 int buscarArchivoTodos (char *archivo)
 {
 	int i;
-	int *sockets;
 	char buffer[512];
+	char buffer2[512];
 	int encontrados = 0; 
 	int Ip_ubicaciones[conectados];
-	
-	sockets = (int)malloc(sizeof(int)*conectados);
 	for (i = 0; i < conectados; i++)
 	{
+		strcpy(buffer,"\0");
 		Ip_ubicaciones[i] = 0; //inicia 0
-		printf("%s    %s\n", InInformacionTodos[i].Puerto, InInformacionTodos[i].IP);		
-		sockets[i] = InitSockClien(InInformacionTodos[i].Puerto, InInformacionTodos[i].IP);
-		strcpy(buffer,"ListarArchivos");
-		EnviarMensaje(sockets[i],"ListarArchivos",strlen("ListarArchivos"));
+		//printf("%s    %s\n", InInformacionTodos[i].Puerto, InInformacionTodos[i].IP);		
+		int j= InitSockClien(InInformacionTodos[i].Puerto, InInformacionTodos[i].IP);
+		EnviarMensaje(j,"ListarArchivos",50);
+		printf(":v\n");
 		while(1)
 	  	{
-			RecibirMensaje(sockets[i],buffer,50);
-			printf("recibi %s\n",buffer );
-			if(strcmp(buffer,archivo) == 0);
+			RecibirMensaje(j,buffer,50);
+			//printf("recibi %s\n",buffer );
+			if(strcmp(buffer,archivo) == 0)
 			{
+				//printf("coincidencia\n");
 				Ip_ubicaciones[i] = 1; //  cuando hay coincidencia
 				encontrados++;
 			}
 			if(strcmp(buffer,"Listado_Completo")==0)
 			{
-				printf("Listado terminado\n");
+				//printf("Listado terminado\n");
 				break;
 			}
 	  	}
-		close(sockets[i]);
+	  	EnviarMensaje(j,"CerrarComuicacion",50);
+		close(j);
 	}
 	
 	if (encontrados == 0)
 	{
+		//printf("Sin Resultados\n");
 		EnviarMensaje(sock2,"SinResultados",strlen("SinResultados"));
 		return 0;
 	}
 
 
-	EnviarMensaje(sock2,"EnvioInfo",strlen("EnvioInfo"));  // envia mensaje para enviar ip y puertos
-	sprintf(buffer,"%d",encontrados); 
-	EnviarMensaje(sock2,buffer,strlen(buffer));  //	cantidad de encontrados
+	EnviarMensaje(sock2,"EnvioInfo",512);  // envia mensaje para enviar ip y puertos
+	int socktemp = sock2;
+	strcmp(buffer2,"\0");
+	sprintf(buffer2,"%d",encontrados); 
+	EnviarMensaje(socktemp,buffer2,50);  //	cantidad de encontrados
 	for (i = 0; i < conectados; i++)
 	{
 		if(Ip_ubicaciones[i] == 1)
 		{
-			EnviarMensaje(sock2, InInformacionTodos[i].IP, strlen(InInformacionTodos[i].IP));
-			EnviarMensaje(sock2, InInformacionTodos[i].Puerto, strlen(InInformacionTodos[i].Puerto));
+			EnviarMensaje(socktemp, InInformacionTodos[i].IP, 50);
+			EnviarMensaje(socktemp, InInformacionTodos[i].Puerto, 50);
+
 		}		
 	}
-	EnviarMensaje(sock2, "TerminaenvioIP", strlen("TerminaenvioIP"));
+	//printf("Termino envio ip\n");
+	EnviarMensaje(socktemp, "Fin", 512);
 	return encontrados;
 
 } 
