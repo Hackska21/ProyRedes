@@ -30,8 +30,8 @@ int RecibirMensaje(int Socket,char* mensaje,int Tamano);
 
 struct Dir
 {
-  char* puerto;
-  char* ip;
+  char puerto[50];
+  char ip[50];
   //char parte;
 
 };

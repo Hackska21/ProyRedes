@@ -1,3 +1,6 @@
+int* ConectarHosts(int NoHost ,struct Dir* Hosts);
+
+
 int VerificarPrefijo (char * Cadena)//Sirve para encontrar Archivos A omitir
 {
 	int tam=strlen(Cadena);
@@ -58,7 +61,7 @@ void ListarArchivos(int sockt,char* directorio)
           printf("Leyendo Archivo: %s\n",ent->d_name );
            if(VerificarPrefijo(ent->d_name)==0)//Si no se esta recibiendo
            {
-           		EnviarMensaje(sockt,ent->d_name,strlen(ent->d_name));
+           		EnviarMensaje(sockt,ent->d_name,100);
            }
           //sprintf(result,"%s %d) %s \n",result,numfiles,ent->d_name);
 
@@ -96,36 +99,60 @@ int FunPendirArchivo(int sockt,char* NombreAr,char* Directorio)
 
 	//PedirNoHost
 	RecibirMensaje(sockt,BufferRecibir,50);
+	printf("Pedi host%s\nfin de recibido\n",BufferRecibir );
+	if(strcmp(BufferRecibir,"SinResultados")==0)
+	{
+		printf("Archivo %s no encontrado :'v\n",NombreAr);
+		return 0;
+	}
+
 	NoHost=atoi(BufferRecibir);
 	//NoHost;
-	
+
+	printf("Numero de host %d\nFin numero host\n",NoHost );
 
 	//Redimensionamos la estructura
 	InfoHosts=(struct Dir*)malloc(NoHost*sizeof(struct Dir));
 	//Pedir Host eh IP al server principal
-	/*
+	
 	int i=0;
 	while(1)
 	{
-		if(strcmp(BufferRecibir,"")==0)
+		RecibirMensaje(sockt,BufferRecibir,50);
+		printf("%s\n",BufferRecibir );
+		getchar();	
+		if(strcmp(BufferRecibir,"TerminaenvioIP")==0)
 		{
+			printf("Salgo con %s %s  \n",InfoHosts[0].puerto,InfoHosts[0].ip);
 			break;
 		}
-		InfoHosts[i].puerto=BufferRecibir;
-		InfoHosts[i].ip=BufferRecibir
+		//InfoHosts[i].ip=(char)malloc(sizeof(char)*50);
+		//printf("Mamo?\n");
+		strcpy(InfoHosts[i].ip,BufferRecibir);
+		//printf("NO O:\n");
+		//InfoHosts[i].ip=BufferRecibir;
+		
+		RecibirMensaje(sockt,BufferRecibir,50);
+		printf("%s  \n",BufferRecibir );
+		
+		//InfoHosts[i].ip=(char)malloc(50);
+		strcpy(InfoHosts[i].puerto,BufferRecibir);
+		//InfoHosts[i].puerto=BufferRecibir;
+		
 		i++;
 	}
-
-	host=ConectarHosts(NoHost,InfoHosts);
-	DescargarArchivo(host,NoSockts,NombreAr,Directorio);
+	printf("Procedo A conectar :v \n");
+	Hosts=ConectarHosts(NoHost,InfoHosts);
+	printf("Conectado!\n");
+	DescargarArchivo(Hosts,NoHost,NombreAr,Directorio);
 
 	for(i=0;i<NoHost;i++)
 	{
-		EnviarMensaje(host[i],"CerrarComuicacion",50);
-		close(host[i]);	
+		EnviarMensaje(Hosts[i],"CerrarComuicacion",50);
+		close(Hosts[i]);	
 	}
 
-*/
+
 	//N
 
 }
@@ -136,7 +163,8 @@ int* ConectarHosts(int NoHost ,struct Dir* Hosts)//Conecta a los host Especifica
 	int i;
 	for (i = 0; i < NoHost; ++i)
 	{
-		//Sockets[i]=InitSockClien(Hosts[i].puerto,Host[i].ip);
+		printf("Conectando a %s %s \n",Hosts[i].puerto,Hosts[i].ip );
+		Sockets[i]=InitSockClien(Hosts[i].puerto,Hosts[i].ip);
 	}
 	return Sockets;
 }

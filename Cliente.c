@@ -17,7 +17,7 @@
 #include "FuncionesDirectorios.c"
 #include "EnviarRecibirArchivos.c"
 
-char* Directorio="./Cliente/";
+char* Directorio;//="./Cliente/";
 pthread_t* hilos;
 int clientes=0;
 
@@ -72,6 +72,8 @@ void* HiloServidorCliente(void* Arg)//Se escuchan Peticiones del Cliente
 	else
 	{
 		printf("%s No es valida en este punto\n",BufferRecibir );
+		getchar();
+		getchar();
 	}
 
   }
@@ -134,7 +136,7 @@ void Menu(int sock)
 	int op;
 	char BufferEnviar[50];
 	do{
-		printf("¿Que desea Hacer\n1)Solicitar ListarArchivos\n2)Salir\n");
+		printf("¿Que desea Hacer\n1)Solicitar ListarArchivos\n0)Salir\n");
 		
 		scanf("%d",&op);
 		if(op)
@@ -159,7 +161,7 @@ void HiloCliente(char* puerto,char* ip,char* puertoEscucha)//Con el Que se hacen
 	Menu(server2);
 
 	//getchar();
-
+	/*
 	//EjemploPedirListado
 	EnviarMensaje(server2,"ListarArchivos",50);
 	while(1)
@@ -181,7 +183,7 @@ void HiloCliente(char* puerto,char* ip,char* puertoEscucha)//Con el Que se hacen
 
   //CerrarComuicacion
   EnviarMensaje(server2,"CerrarComuicacion",50);
-
+	*/
 
 }
 
@@ -190,15 +192,16 @@ int main(int argc, char const *argv[])
 {
 		
 	signal(2, trapper);
-	if(argc<4)
+	if(argc<5)
     {
-     	printf("faltan argumentos <puerto> <PuertoDestino> <ip>\n");
+     	printf("faltan argumentos <puerto> <PuertoDestino> <ip> <nomrbecarpeta>\n");
      	exit(1);
     }
-
+    Directorio=argv[4];
     pthread_t Des_HiloServidor;
     struct Dir ServInf;
-  	ServInf.puerto=argv[1];
+  	//ServInf.puerto=argv[1];
+  	strcpy(ServInf.puerto,argv[1]);
 
   	pthread_create (&Des_HiloServidor, NULL,HiloServidor  ,(void*)&ServInf);
   	//printf("O:\n");
